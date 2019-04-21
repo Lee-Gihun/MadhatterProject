@@ -1,2 +1,2 @@
-.ipynp_checkpoints
-__pycache__
+.ipynp_checkpoints*
+__pycache__/
