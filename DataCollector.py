@@ -245,7 +245,7 @@ class DataCollector():
         # error handling for 404 error
         try:
             # if user has valid tier and rank
-            user_id = watcher.summoner.by_name(self.my_region, userName)['id']
+            user_id = self.watcher.summoner.by_name(self.my_region, userName)['id']
             if self.watcher.league.by_summoner('kr', user_id):
                 validity = True
                 
