@@ -1,13 +1,3 @@
-from riotwatcher import RiotWatcher, ApiError
-from urllib.request import urlopen
-from urllib import parse
-from bs4 import BeautifulSoup
-
-import operator
-import json
-
-
-
 class DataCollector():
     def __init__(self,  api_key, batch_size=1000, path='./', my_region='kr'):
         self.path = path
@@ -37,17 +27,15 @@ class DataCollector():
             self.key_to_id = json.load(fp)
 
             
-    def user_selector(self, Tier='DIAMOND', Rank='III'):
+    def user_selector(self, path, idx):
         """
         retrieve a list of target user data
         """
-        target_users = []
-        league_list = self.watcher.league.entries(self.my_region, 'RANKED_SOLO_5x5', Tier, Rank)
-        
-        for player in league_list:
-            target_users.append(player['summonerName'])
+        # get collected user_name lists
+        with open(path+'/userlist{}.json'.format(idx), 'r') as fp:
+            user_list = json.load(fp)['user_name']
             
-        return target_users
+        return user_list
 
 
     def user_data_setter(self, userName):
@@ -210,6 +198,7 @@ class DataCollector():
                 continue
             
             user_data = self.user_data_setter(user)
+            print(user_data)
             
             if self.is_valid_data(user_data):
                 self.data[user] = user_data 
@@ -250,7 +239,7 @@ class DataCollector():
                 validity = True
                 
         except:
-            return validity
+            pass
         
         return validity
             
