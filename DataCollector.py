@@ -1,5 +1,15 @@
+from riotwatcher import RiotWatcher, ApiError
+from urllib.request import urlopen
+from urllib import parse
+from bs4 import BeautifulSoup
+
+import operator
+import json
+
+from time import time
+
 class DataCollector():
-    def __init__(self,  api_key, batch_size=1000, path='./', my_region='kr'):
+    def __init__(self,  api_key, batch_size=10000, path='./', my_region='kr'):
         self.path = path
         self.watcher = RiotWatcher(api_key)
         self.my_region = my_region
@@ -7,6 +17,7 @@ class DataCollector():
         self.data = {}
         self.batch_size = batch_size
         self.batch_index = 0
+        self.userlist_index = 0
         
         self.name_to_key = {}
         self.name_to_id = {}
@@ -35,6 +46,8 @@ class DataCollector():
         with open(path+'/userlist{}.json'.format(idx), 'r') as fp:
             user_list = json.load(fp)['user_name']
             
+        self.userlist_index = idx
+
         return user_list
 
 
@@ -191,20 +204,30 @@ class DataCollector():
         """
         allocate self.batch_size users data in a single .json file.
         if file exists, then raise file index.
+
+        target_users: list of user name
         """
         
+        start = time()
         for i, user in enumerate(target_users):
             if not self.is_valid_user(user):
                 continue
             
             user_data = self.user_data_setter(user)
-            print(user_data)
             
             if self.is_valid_data(user_data):
                 self.data[user] = user_data 
+            else:
+                print('Not valid user data, user: {}'.format(user))
+                continue
             
+            if len(self.data.keys()) % 10 == 0:
+                print('{} users data collected'.format(len(self.data.keys())))
+                print('elapsed time for 10 users: {}'.format(time() - start))
+                start = time()
+
             if len(self.data.keys()) > 0 and (len(self.data.keys()) % self.batch_size == 0):
-                with open('./data_batch/batch{}.json'.format(self.batch_index), 'w') as fp:
+                with open('./data_batch/batch{}_{}.json'.format(self.userlist_index, self.batch_index), 'w') as fp:
                     json.dump(self.data, fp)
                 
                 print('----------------------------')
