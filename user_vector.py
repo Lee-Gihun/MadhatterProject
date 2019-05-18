@@ -1,5 +1,4 @@
 import json
-import sys
 
 class UserVectorGenerator():
     def __init__(self, batch_file):
@@ -43,7 +42,7 @@ class UserVectorGenerator():
 
         return mastery_score_vector
 
-    def make_user_vectors_json(self):
+    def make_user_vectors(self):
         user_vectors = {}
 
         for user_name in self.batch_data:
@@ -51,8 +50,25 @@ class UserVectorGenerator():
             mastery_score_vector = self._get_mastery_score_vector(user_name)
             user_vectors[user_name] = play_count_vector + mastery_score_vector
 
-        with open('./data_batch/user_vectors.json', 'w') as fp:
-            json.dump(user_vectors, fp)
+        return user_vectors
 
-user_vector_generator = UserVectorGenerator('./data_batch/batch2_0.json')
-user_vector_generator.make_user_vectors_json()
+if __name__ == '__main__':
+    user_vectors = {}
+
+    # batch for userlist 2
+    for i in range(12):
+        user_vector_generator = UserVectorGenerator('./data_batch/batch2_{}.json'.format(i))
+        user_vectors.update(user_vector_generator.make_user_vectors())
+
+    # batch for userlist 3
+    for i in range(4):
+        user_vector_generator = UserVectorGenerator('./data_batch/batch3_{}.json'.format(i))
+        user_vectors.update(user_vector_generator.make_user_vectors())
+
+    # batch for userlist 4
+    for i in range(3):
+        user_vector_generator = UserVectorGenerator('./data_batch/batch4_{}.json'.format(i))
+        user_vectors.update(user_vector_generator.make_user_vectors())
+
+    with open('./data_batch/user_vectors.json', 'w') as fp:
+        json.dump(user_vectors, fp)
