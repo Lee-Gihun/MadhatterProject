@@ -108,8 +108,7 @@ class ItemVectorGenerator():
         champ_corr_matrix = {} # champ_num by champ_num matrix
 
         for user_name in self.batch_data:
-            play_count_tf_idf_vector = self._get_play_count_tf_idf_vector(user_name)
-            tf_idf_matrix[user_name] = play_count_tf_idf_vector
+            tf_idf_matrix[user_name] = self._get_play_count_tf_idf_vector(user_name)
 
         champ_corr_matrix = self._get_champ_corr_matrix(tf_idf_matrix)
 
@@ -119,25 +118,10 @@ if __name__ == '__main__':
     item_vectors = {}
     idf_table = make_idf_table()
 
-    # batch for userlist 2
-    for i in range(12):
-        batch_file = '../data_batch/batch2_' + str(i) + '.json'
-        item_vector_generator = ItemVectorGenerator(batch_file)
-        item_vectors.update(item_vector_generator.make_item_vectors())
-
-    # batch for userlist 3
-    for i in range(4):
-        batch_file = '../data_batch/batch3_' + str(i) + '.json'
-        item_vector_generator = ItemVectorGenerator(batch_file)
-        item_vectors.update(item_vector_generator.make_item_vectors())
-
-    # batch for userlist 4
-    for i in range(3):
-        batch_file = '../data_batch/batch4_' + str(i) + '.json'
-        item_vector_generator = ItemVectorGenerator(batch_file)
-        item_vectors.update(item_vector_generator.make_item_vectors())
+    batch_file = './userbatch.json'
+    item_vector_generator = ItemVectorGenerator(batch_file)
+    item_vectors = item_vector_generator.make_item_vectors()
 
     item_vectors_file = './item_vectors_tf_idf.json'
-
     with open(item_vectors_file, 'w') as fp:
         json.dump(item_vectors, fp)
