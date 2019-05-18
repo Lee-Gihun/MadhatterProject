@@ -104,26 +104,26 @@ if __name__ == '__main__':
 
     # batch for userlist 2
     for i in range(12):
-        batch_file = '../data_batch/batch2_' + str(i) + '.json'
+        batch_file = './data_batch/batch2_' + str(i) + '.json'
         user_vector_generator = UserVectorGenerator(batch_file, mode)
         user_vectors.update(user_vector_generator.make_user_vectors())
 
     # batch for userlist 3
     for i in range(4):
-        batch_file = '../data_batch/batch3_' + str(i) + '.json'
+        batch_file = './data_batch/batch3_' + str(i) + '.json'
         user_vector_generator = UserVectorGenerator(batch_file, mode)
         user_vectors.update(user_vector_generator.make_user_vectors())
 
     # batch for userlist 4
     for i in range(3):
-        batch_file = '../data_batch/batch4_' + str(i) + '.json'
+        batch_file = './data_batch/batch4_' + str(i) + '.json'
         user_vector_generator = UserVectorGenerator(batch_file, mode)
         user_vectors.update(user_vector_generator.make_user_vectors())
 
     if mode == 1:
-        user_vectors_file = '../data_batch/user_vectors_naive.json'
+        user_vectors_file = './datasets/user_vectors_naive.json'
     elif mode == 2:
-        user_vectors_file = '../data_batch/user_vectors_tf_idf.json'
+        user_vectors_file = './datasets/user_vectors_tf_idf.json'
 
     with open(user_vectors_file, 'w') as fp:
         json.dump(user_vectors, fp)

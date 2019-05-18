@@ -118,10 +118,10 @@ if __name__ == '__main__':
     item_vectors = {}
     idf_table = make_idf_table()
 
-    batch_file = './userbatch.json'
+    batch_file = './data_batch/userbatch.json'
     item_vector_generator = ItemVectorGenerator(batch_file)
     item_vectors = item_vector_generator.make_item_vectors()
 
-    item_vectors_file = './item_vectors_tf_idf.json'
+    item_vectors_file = './datasets/item_vectors_tf_idf.json'
     with open(item_vectors_file, 'w') as fp:
         json.dump(item_vectors, fp)
