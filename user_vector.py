@@ -4,6 +4,9 @@ from champ_id_remap import champ_id_remap
 from global_win_rate import global_win_rate
 import sys
 
+PLAY_COUNT = 1
+MASTERY_SCORE = 2
+
 class UserVectorGenerator():
     def __init__(self, batch_file, mode):
         """
@@ -30,10 +33,10 @@ class UserVectorGenerator():
             Needed for accessing idf_table
         mode: Method for generating user vector measure
         measure: Determine which measure to get compute the value of user vector
-            1: play count
-            2: mastery score
+            PLAY_COUNT: play count
+            MASTERY_SCORE: mastery score
         """
-        if measure == 1: # play count
+        if measure == PLAY_COUNT: # play count
             if mode == 1: # Naive mode
                 return champ_history['play_count']
 
@@ -51,7 +54,7 @@ class UserVectorGenerator():
 
                 return weighted_rate * play_count_tf_idf
 
-        elif measure == 2: # mastery score
+        elif measure == MASTERY_SCORE: # mastery score
             if mode == 1: # Naive mode
                 return champ_history['championPoints']
 
@@ -89,7 +92,7 @@ class UserVectorGenerator():
             original_champ_id = champ_history['champion_key']
             champ_idx = self.remapped_champ_id[original_champ_id]
 
-            play_count_vector[champ_idx] = self._get_user_vector_measure(user_name, champ_history, champ_idx, self.mode, 1)
+            play_count_vector[champ_idx] = self._get_user_vector_measure(user_name, champ_history, champ_idx, self.mode, PLAY_COUNT)
 
         return play_count_vector
 
@@ -113,7 +116,7 @@ class UserVectorGenerator():
             original_champ_id = champ_history['champion_key']
             champ_idx = self.remapped_champ_id[original_champ_id]
 
-            mastery_score_vector[champ_idx] = self._get_user_vector_measure(user_name, champ_history, champ_idx, self.mode, 2)
+            mastery_score_vector[champ_idx] = self._get_user_vector_measure(user_name, champ_history, champ_idx, self.mode, MASTERY_SCORE)
 
         return mastery_score_vector
 
