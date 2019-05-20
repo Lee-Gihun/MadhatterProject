@@ -143,9 +143,9 @@ if __name__ == '__main__':
     user_vectors = user_vector_generator.make_user_vectors()
 
     if mode == 1:
-        user_vectors_file = './datasets/user_vectors_naive2.json'
+        user_vectors_file = './datasets/user_vectors_naive.json'
     elif mode == 2:
-        user_vectors_file = './datasets/user_vectors_tf_idf2.json'
+        user_vectors_file = './datasets/user_vectors_tf_idf.json'
     elif mode == 3:
         user_vectors_file = './datasets/user_vectors_tf_idf_global_win_rate.json'
 
