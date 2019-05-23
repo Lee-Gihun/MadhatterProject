@@ -86,13 +86,28 @@ class UserVectorGenerator():
         return max_play_count
 
     def _get_play_count_vector(self, user_name):
-        play_count_vector = [0 for _ in range(self.champ_num)]
+        #play_count_vector = [0 for _ in range(self.champ_num)]
+
+        #for champ_history in self.batch_data[user_name]['champion_history']:
+        #    play_count_vector[champ_idx] = \
+        #            self._get_user_vector_measure(user_name, champ_history, \
+        #            champ_idx, self.mode, PLAY_COUNT)
+        play_count_vector = dict()
 
         for champ_history in self.batch_data[user_name]['champion_history']:
             original_champ_id = champ_history['champion_key']
-            champ_idx = self.remapped_champ_id[original_champ_id]
+            exclude_champ_idx = self.remapped_champ_id[original_champ_id]
+            play_count_vector[exclude_champ_idx] = [0 for _ in range(self.champ_num)]
 
-            play_count_vector[champ_idx] = self._get_user_vector_measure(user_name, champ_history, champ_idx, self.mode, PLAY_COUNT)
+        for exclude_champ_idx in play_count_vector:
+            if exclude_champ_idx == self.remapped_champ_id[champ_history['champion_key']]:
+                continue
+
+            original_champ_id = champ_history['champion_key']
+            champ_idx = self.remapped_champ_id[original_champ_id]
+            play_count_vector[exclude_champ_idx][champ_idx] = \
+                    self._get_user_vector_measure(user_name, champ_history, \
+                    champ_idx, self.mode, PLAY_COUNT)
 
         return play_count_vector
 
@@ -116,7 +131,9 @@ class UserVectorGenerator():
             original_champ_id = champ_history['champion_key']
             champ_idx = self.remapped_champ_id[original_champ_id]
 
-            mastery_score_vector[champ_idx] = self._get_user_vector_measure(user_name, champ_history, champ_idx, self.mode, MASTERY_SCORE)
+            mastery_score_vector[champ_idx] = \
+                    self._get_user_vector_measure(user_name, champ_history, \
+                    champ_idx, self.mode, MASTERY_SCORE)
 
         return mastery_score_vector
 
@@ -125,8 +142,8 @@ class UserVectorGenerator():
 
         for user_name in self.batch_data:
             play_count_vector = self._get_play_count_vector(user_name)
-            mastery_score_vector = self._get_mastery_score_vector(user_name)
-            user_vectors[user_name] = play_count_vector + mastery_score_vector
+            #mastery_score_vector = self._get_mastery_score_vector(user_name)
+            user_vectors[user_name] = play_count_vector #+ mastery_score_vector
 
         return user_vectors
 
@@ -150,7 +167,7 @@ if __name__ == '__main__':
     elif mode == 2:
         user_vectors_file = './datasets/user_vectors_tf_idf.json'
     elif mode == 3:
-        user_vectors_file = './datasets/user_vectors_tf_idf_global_win_rate.json'
+        user_vectors_file = './datasets/user_vectors_tf_idf_excluding.json'
 
     with open(user_vectors_file, 'w') as fp:
         json.dump(user_vectors, fp)
