@@ -100,14 +100,16 @@ class UserVectorGenerator():
             play_count_vector[exclude_champ_idx] = [0 for _ in range(self.champ_num)]
 
         for exclude_champ_idx in play_count_vector:
-            if exclude_champ_idx == self.remapped_champ_id[champ_history['champion_key']]:
-                continue
+            for champ_history in self.batch_data[user_name]['champion_history']:
+                if exclude_champ_idx == self.remapped_champ_id[champ_history['champion_key']]:
+                    continue
 
-            original_champ_id = champ_history['champion_key']
-            champ_idx = self.remapped_champ_id[original_champ_id]
-            play_count_vector[exclude_champ_idx][champ_idx] = \
-                    self._get_user_vector_measure(user_name, champ_history, \
-                    champ_idx, self.mode, PLAY_COUNT)
+                original_champ_id = champ_history['champion_key']
+                champ_idx = self.remapped_champ_id[original_champ_id]
+
+                play_count_vector[exclude_champ_idx][champ_idx] = \
+                        self._get_user_vector_measure(user_name, champ_history, \
+                        champ_idx, self.mode, PLAY_COUNT)
 
         return play_count_vector
 
