@@ -94,6 +94,8 @@ class UserVectorGenerator():
         #            champ_idx, self.mode, PLAY_COUNT)
         play_count_vector = dict()
 
+        user_win_rate = self.batch_data[user_name]['win_rate'];
+
         for champ_history in self.batch_data[user_name]['champion_history']:
             original_champ_id = champ_history['champion_key']
             exclude_champ_idx = self.remapped_champ_id[original_champ_id]
@@ -101,7 +103,7 @@ class UserVectorGenerator():
             exclude_champ_play_count = champ_history['play_count']
             exclude_champ_win_rate = champ_history['win_rate']
             play_count_vector[exclude_champ_idx] = (exclude_champ_play_count, \
-                    exclude_champ_win_rate, [0 for _ in range(self.champ_num)])
+                    exclude_champ_win_rate, user_win_rate, [0 for _ in range(self.champ_num)])
 
         for exclude_champ_idx in play_count_vector:
             for champ_history in self.batch_data[user_name]['champion_history']:
@@ -111,7 +113,7 @@ class UserVectorGenerator():
                 original_champ_id = champ_history['champion_key']
                 champ_idx = self.remapped_champ_id[original_champ_id]
 
-                play_count_vector[exclude_champ_idx][2][champ_idx] = \
+                play_count_vector[exclude_champ_idx][3][champ_idx] = \
                         self._get_user_vector_measure(user_name, champ_history, \
                         champ_idx, self.mode, PLAY_COUNT)
 
