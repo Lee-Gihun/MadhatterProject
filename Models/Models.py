@@ -38,15 +38,20 @@ class Predictor(nn.Module):
     def __init__(self, user_len, item_len, hidden_unit):
         super(Predictor, self).__init__()
         self.layer1 = nn.Linear(user_len+item_len, hidden_unit)
-        self.relu = nn.ReLU(inplace=True)
-        self.layer2 = nn.Linear(hidden_unit, 1)
-        self.sigmoid = nn.Sigmoid()
+        self.layer2 = nn.Linear(hidden_unit, hidden_unit)
+        self.layer3 = nn.Linear(hidden_unit+2, 1)
+        self.relu = nn.LeakyReLU(inplace=True)
+        self.dropout = nn.Dropout(p=0.5)
     
-    def forward(self, user, item):
+    def forward(self, user, item, win_rate, global_win_rate):
         x = torch.cat((user, item), dim=1)
         x = self.layer1(x)
         x = self.relu(x)
         x = self.layer2(x)
-        x = self.sigmoid(x)
+        x = self.relu(x)
+        x = torch.cat((x, win_rate), dim=1)
+        x = torch.cat((x, global_win_rate), dim=1)
+        x = self.dropout(x)
+        x = self.layer3(x)
         return x
     
