@@ -2,7 +2,6 @@ import json
 import math
 from math import log2
 
-
 def champ_id_remap():
     original_champ_id = {}
     remapped_champ_id = {}
@@ -15,14 +14,10 @@ def champ_id_remap():
     
     return remapped_champ_id
 
-
 def get_original_champ_id(remapped_champ_id, champ_idx):
     for original_id, remapped_id in remapped_champ_id.iteritems():
         if remapped_id == champ_idx:
             return original_id
-
-        
-        
 
 def make_idf_table():
     remapped_champ_id = champ_id_remap()
@@ -72,13 +67,10 @@ def make_idf_table():
 
     return idf_table
         
-        
-        
-# index for tuple in global_win_stat list
-WIN = 0
-PLAY = 1
-
 def global_win_rate():
+    # index for tuple in global_win_stat list
+    WIN = 0
+    PLAY = 1
     remapped_champ_id = champ_id_remap()
     global_win_stat = [[0, 0] for _ in range(len(remapped_champ_id))]
 
@@ -99,4 +91,3 @@ def global_win_rate():
     global_win_rate = [(round(global_win_stat[i][WIN] / global_win_stat[i][PLAY], 2)) for i in range(len(global_win_stat))]
 
     return global_win_rate
-
