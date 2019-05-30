@@ -83,11 +83,11 @@ def global_win_rate():
             champ_idx = remapped_champ_id[original_champ_id]
 
             this_champ_play = champ_history['play_count']
-            this_champ_win = math.ceil(this_champ_play * champ_history['win_rate'])
+            this_champ_win = this_champ_play * champ_history['win_rate']
 
             global_win_stat[champ_idx][WIN] += this_champ_win
             global_win_stat[champ_idx][PLAY] += this_champ_play
 
-    global_win_rate = [(round(global_win_stat[i][WIN] / global_win_stat[i][PLAY], 2)) for i in range(len(global_win_stat))]
+    global_win_rate = [(round(global_win_stat[i][WIN] / global_win_stat[i][PLAY], 3)) for i in range(len(global_win_stat))]
 
     return global_win_rate
