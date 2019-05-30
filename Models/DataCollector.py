@@ -9,7 +9,7 @@ import json
 from time import time
 
 class DataCollector():
-    def __init__(self,  api_key, batch_size=10000, path='./', my_region='kr'):
+    def __init__(self,  api_key=None, batch_size=10000, path='./', my_region='kr'):
         self.path = path
         self.watcher = RiotWatcher(api_key)
         self.my_region = my_region
