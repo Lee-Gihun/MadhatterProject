@@ -15,7 +15,7 @@ def champ_id_remap():
     return remapped_champ_id
 
 def get_original_champ_id(remapped_champ_id, champ_idx):
-    for original_id, remapped_id in remapped_champ_id.iteritems():
+    for original_id, remapped_id in remapped_champ_id.items():
         if remapped_id == champ_idx:
             return original_id
 
