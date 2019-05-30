@@ -44,13 +44,16 @@ class Predictor(nn.Module):
         self.dropout = nn.Dropout(p=0.5)
     
     def forward(self, user, item, win_rate, global_win_rate):
-        x = torch.cat((user, item), dim=1)
+        dim = 1
+        if len(user.shape) + len(item.shape) == 2:
+            dim = 0
+        x = torch.cat((user, item), dim=dim)
         x = self.layer1(x)
         x = self.relu(x)
         x = self.layer2(x)
         x = self.relu(x)
-        x = torch.cat((x, win_rate), dim=1)
-        x = torch.cat((x, global_win_rate), dim=1)
+        x = torch.cat((x, win_rate), dim=dim)
+        x = torch.cat((x, global_win_rate), dim=dim)
         x = self.dropout(x)
         x = self.layer3(x)
         return x
