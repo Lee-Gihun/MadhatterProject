@@ -1,4 +1,5 @@
 import json
+import csv
 import math
 from math import log2
 
@@ -91,3 +92,41 @@ def global_win_rate():
     global_win_rate = [(round(global_win_stat[i][WIN] / global_win_stat[i][PLAY], 3)) for i in range(len(global_win_stat))]
 
     return global_win_rate
+
+def champion_similarity_csv_to_json():
+    similarity_matrix = dict()
+    remapped_champ_id = champ_id_remap()
+
+    with open('./metadata/id_to_key.json', 'r') as f:
+        original_champ_id_dict = json.load(f)
+
+    champ_node_file = open('./datasets/allchampions_nodes.csv', 'r')
+    champ_node_reader = csv.reader(champ_node_file, delimiter=',')
+    node_column = next(champ_node_reader)
+
+    champ_edge_file = open('./datasets/allchampions_edges.csv', 'r')
+    champ_edge_reader = csv.reader(champ_edge_file, delimiter=',')
+    edge_column = next(champ_edge_reader)
+
+    CHAMP_NAME = 1
+    for champ_node_row in champ_node_reader:
+        champ_name = champ_node_row[CHAMP_NAME]
+        original_champ_id = original_champ_id_dict[champ_name]
+        champ_idx = remapped_champ_id[original_champ_id]
+        similarity_matrix[champ_idx] = [0 for _ in range(len(original_champ_id_dict))]
+
+    SOURCE_CHAMP = 0
+    TARGET_CHAMP = 1
+    EDGE_WEIGHT = 2
+    for champ_edge_row in champ_edge_reader:
+        source_champ_idx = remapped_champ_id[original_champ_id_dict[champ_edge_row[SOURCE_CHAMP]]]
+        target_champ_idx = remapped_champ_id[original_champ_id_dict[champ_edge_row[TARGET_CHAMP]]]
+        weight = float(champ_edge_row[EDGE_WEIGHT])
+
+        if similarity_matrix[source_champ_idx][target_champ_idx] == 0 and \
+           similarity_matrix[target_champ_idx][source_champ_idx] == 0:
+            similarity_matrix[source_champ_idx][target_champ_idx] = weight
+            similarity_matrix[target_champ_idx][source_champ_idx] = weight
+
+    with open('./datasets/item_vectors_weights.json', 'w') as f:
+        json.dump(similarity_matrix, f)

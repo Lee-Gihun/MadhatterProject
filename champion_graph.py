@@ -53,10 +53,10 @@ if __name__ == '__main__':
         key_to_name = json.load(f)
 
     # make champion node
-    CHAMP_NAMAE = 1
+    CHAMP_NAME = 1
     champ_node_dict = dict()
     for champ_node_row in champ_node_reader:
-        champ_name = champ_node_row[CHAMP_NAMAE]
+        champ_name = champ_node_row[CHAMP_NAME]
         champ_node_dict[champ_name] = Node(champ_name, 0.0)
 
     # read user's tf idf value for each champion
