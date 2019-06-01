@@ -1,10 +1,13 @@
 class Node:
-    def __init__(self, data, tf_idf):
-        self.data = data
+    def __init__(self, name, tf_idf):
+        self.name = name
         self.tf_idf = tf_idf
 
-    def get_data(self):
-        return self.data
+    def get_name(self):
+        return self.name
+
+    def set_tf_idf(self, tf_idf):
+        self.tf_idf = tf_idf
 
     def get_tf_idf(self):
         return self.tf_idf
@@ -28,18 +31,21 @@ class Graph:
 
         if (node1 in self.node_dict[node2]) and \
            (node2 in self.node_dict[node1]):
-               print('node {} and {} are already connected'.format(node1.get_data(), node2.get_data()))
+               print('node {} and {} are already connected'.format(node1.get_name(), node2.get_name()))
                return
 
         self.node_dict[node1][node2] = weight
         self.node_dict[node2][node1] = weight
 
+    def graph_size(self):
+        return len(self.node_dict)
+
     def print_graph(self):
         for node in self.node_dict:
-            print('{}: '.format(node.get_data()), end='')
+            print('{}: '.format(node.get_name()), end='')
             print('{', end='')
             for neighbor in self.node_dict[node]:
-                print('{}: {}, '.format(neighbor.get_data(), self.node_dict[node][neighbor]), end='')
+                print('{}: {}, '.format(neighbor.get_name(), self.node_dict[node][neighbor]), end='')
 
             print('}')
 
@@ -55,7 +61,7 @@ class Graph:
         visited = {init_node: 0}
         prev_node = {init_node: None}
 
-        nodes = set(graph.node_dict.keys())
+        nodes = set(self.node_dict.keys())
 
         # start from init_node
         while nodes:
@@ -74,8 +80,8 @@ class Graph:
             current_weight = visited[min_neighbor]
 
             # find neighbor and distance from this node
-            for neighbor_node in graph.node_dict[min_neighbor]:
-                weight = current_weight + graph.node_dict[min_neighbor][neighbor_node]
+            for neighbor_node in self.node_dict[min_neighbor]:
+                weight = current_weight + self.node_dict[min_neighbor][neighbor_node]
                 if neighbor_node not in visited or weight < visited[neighbor_node]:
                     visited[neighbor_node] = weight
                     prev_node[neighbor_node] = min_neighbor
@@ -126,11 +132,11 @@ if __name__ == '__main__':
     visited, prev_node = graph.dijkstra(node1)
     print('=' * 20, 'Visited', '=' * 20)
     for visit_node in visited:
-        print('{}: {}'.format(visit_node.get_data(), visited[visit_node]))
+        print('{}: {}'.format(visit_node.get_name(), visited[visit_node]))
 
     print('=' * 20, 'Prev Node', '=' * 20)
     for node in prev_node:
         if prev_node[node] == None:
-            print('{}: {}'.format(node.get_data(), 'None'))
+            print('{}: {}'.format(node.get_name(), 'None'))
         else:
-            print('{}: {}'.format(node.get_data(), prev_node[node].get_data()))
+            print('{}: {}'.format(node.get_name(), prev_node[node].get_name()))
