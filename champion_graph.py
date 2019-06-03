@@ -2,6 +2,8 @@ import csv
 import json
 from undirected_graph import Node, Graph
 from utils import champ_id_remap, get_original_champ_id
+from Models.UserInspector import UserInspector
+from vector_generator import generate_user_vector
 
 def create_remapped_id_node():
     champion_node_old_file = open('./datasets/allchampions_old_nodes.csv', 'r')
@@ -59,10 +61,13 @@ if __name__ == '__main__':
         champ_name = champ_node_row[CHAMP_NAME]
         champ_node_dict[champ_name] = Node(champ_name, 0.0)
 
-    # read user's tf idf value for each champion
-    user_name = 'Tuder'
+    # get user's tf idf value for each champion
+    user_name = input('Enter user name: ')
+    user_inspector = UserInspector()
+    user_data = {user_name: user_inspector.user_history_collector(user_name)}
     champ_num = len(champ_node_dict)
-    user_tf_idf = user_vectors[user_name][:champ_num]
+    user_tf_idf = generate_user_vector(2, batch_data=user_data, to_file=False)[user_name]
+
     user_top_7 = list()
     remapped_champ_id_dict = champ_id_remap()
     for champ_idx, tf_idf in enumerate(user_tf_idf):
@@ -113,11 +118,11 @@ if __name__ == '__main__':
                         overall_distance_dict[champ_name] = distance[champ_node] * tf_idf
                     else:
                         overall_distance_dict[champ_name] += distance[champ_node] * tf_idf
-                else:
-                    print('{} is not connected with {}'.format(champ_name, top_7_champ_name))
+                #else:
+                #    print('{} is not connected with {}'.format(champ_name, top_7_champ_name))
 
     # sort overall distance dictionary and get the closeset one
-    min_distance = 1.0e4
+    min_distance = 1.0e5
     nearest_champ = ''
     for champ_name, distance in overall_distance_dict.items():
         if min_distance > distance:
@@ -125,7 +130,6 @@ if __name__ == '__main__':
             nearest_champ = champ_name
 
     print('nearest: {}, distance: {}'.format(nearest_champ, min_distance))
-
 
     champ_node_file.close()
     champ_edge_file.close()
