@@ -7,6 +7,10 @@ from utils import champ_id_remap, get_original_champ_id
 from Models.UserInspector import UserInspector
 
 def create_remapped_id_node():
+    # original champion ID dictionary from Riot
+    with open('./metadata/id_to_key.json', 'r') as f:
+        original_champ_id_dict = json.load(f)
+
     champion_node_old_file = open('./datasets/graph_data/allchampions_old_nodes.csv', 'r')
     champion_node_old_reader = csv.reader(champion_node_old_file, delimiter=',')
     champion_node_file = open('./datasets/graph_data/allchampions_nodes.csv', 'w')
@@ -37,10 +41,6 @@ class ChampionGraph():
 
         # add champion correleation edge to graph
         self.__add_champion_edge()
-
-        # original champion ID dictionary from Riot
-        with open('./metadata/id_to_key.json', 'r') as f:
-            self.original_champ_id_dict = json.load(f)
 
         # get champ key to name table
         with open('./metadata/key_to_id.json', 'r') as f:
