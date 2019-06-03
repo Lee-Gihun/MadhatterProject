@@ -7,9 +7,9 @@ from utils import champ_id_remap, get_original_champ_id
 from Models.UserInspector import UserInspector
 
 def create_remapped_id_node():
-    champion_node_old_file = open('./datasets/allchampions_old_nodes.csv', 'r')
+    champion_node_old_file = open('./datasets/graph_data/allchampions_old_nodes.csv', 'r')
     champion_node_old_reader = csv.reader(champion_node_old_file, delimiter=',')
-    champion_node_file = open('./datasets/allchampions_nodes.csv', 'w')
+    champion_node_file = open('./datasets/graph_data/allchampions_nodes.csv', 'w')
     champion_node_writer = csv.writer(champion_node_file, delimiter=',')
 
     node_old_column = next(champion_node_old_reader)
@@ -51,11 +51,11 @@ class ChampionGraph():
 
         # read champion node data
         try:
-            champ_node_file = open('./datasets/allchampions_nodes.csv', 'r')
+            champ_node_file = open('./datasets/graph_data/allchampions_nodes.csv', 'r')
             champ_node_reader = csv.reader(champ_node_file, delimiter=',')
         except FileNotFoundError:
             create_remapped_id_node()
-            champ_node_file = open('./datasets/allchampions_nodes.csv', 'r')
+            champ_node_file = open('./datasets/graph_data/allchampions_nodes.csv', 'r')
             champ_node_reader = csv.reader(champ_node_file, delimiter=',')
 
         # skip first line
@@ -81,7 +81,7 @@ class ChampionGraph():
 
     def __add_champion_edge(self):
         # read champion relationship (edge of graph) data
-        champ_edge_file = open('./datasets/allchampions_edges.csv', 'r')
+        champ_edge_file = open('./datasets/graph_data/allchampions_edges.csv', 'r')
         champ_edge_reader = csv.reader(champ_edge_file, delimiter=',')
 
         # skip first line of csv file
