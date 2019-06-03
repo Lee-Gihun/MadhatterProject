@@ -8,13 +8,15 @@ PLAY_COUNT = 1
 MASTERY_SCORE = 2
 
 class UserVectorGenerator():
-    def __init__(self, batch_file, mode):
+    def __init__(self, batch_data, mode):
         """
         mode: Determine which method to generate user vectors
             1: Naive method. Just get literal value from data
             2: TF-IDF method. Calcuate TF-IDF value for each vector value
             3: TF-IDF with global win rate mode
+            4: TF-IDF with excluding one champion mode
         """
+        self.batch_data = batch_data
         self.remapped_champ_id = champ_id_remap()
         self.champ_num = len(self.remapped_champ_id)
         self.global_win_rate = global_win_rate()
@@ -22,9 +24,6 @@ class UserVectorGenerator():
 
         if mode == 2 or mode == 3: # TF-IDF mode or TF-IDF with global win rate mode
             self.idf_table = make_idf_table()
-
-        with open(batch_file, 'r') as fp:
-            self.batch_data = json.load(fp)
 
     def _get_user_vector_measure(self, user_name, champ_history, champ_idx, mode, measure):
         """
@@ -47,7 +46,7 @@ class UserVectorGenerator():
                 max_play_count = self._get_max_play_count(user_name)
                 return (champ_history['play_count'] / max_play_count) * self.idf_table[champ_idx]
 
-            elif mode == 3: # TF-IDF with global win rate
+            elif mode == 3 or mode == 4: # TF-IDF with global win rate / excluding mode
                 max_play_count = self._get_max_play_count(user_name)
                 this_champ_global_win_rate = self.global_win_rate[champ_idx]
                 this_user_champ_win_rate = champ_history['win_rate']
@@ -65,7 +64,7 @@ class UserVectorGenerator():
                 max_mastery_score = self._get_max_mastery_score(user_name)
                 return (champ_history['championPoints'] / max_mastery_score) * self.idf_table[champ_idx]
 
-            elif mode == 3: # TF-IDF with global win rate
+            elif mode == 3 or mode == 4: # TF-IDF with global win rate / excluding mode
                 max_mastery_score = self._get_max_mastery_score(user_name)
                 this_champ_global_win_rate = self.global_win_rate[champ_idx]
                 this_user_champ_win_rate = champ_history['win_rate']
@@ -89,34 +88,38 @@ class UserVectorGenerator():
         return max_play_count
 
     def _get_play_count_vector(self, user_name):
-        #play_count_vector = [0 for _ in range(self.champ_num)]
+        if self.mode == 4:
+            play_count_vector = dict()
 
-        #for champ_history in self.batch_data[user_name]['champion_history']:
-        #    play_count_vector[champ_idx] = \
-        #            self._get_user_vector_measure(user_name, champ_history, \
-        #            champ_idx, self.mode, PLAY_COUNT)
-        play_count_vector = dict()
+            user_win_rate = self.batch_data[user_name]['win_rate'];
 
-        user_win_rate = self.batch_data[user_name]['win_rate'];
-
-        for champ_history in self.batch_data[user_name]['champion_history']:
-            original_champ_id = champ_history['champion_key']
-            exclude_champ_idx = self.remapped_champ_id[original_champ_id]
-
-            exclude_champ_play_count = champ_history['play_count']
-            exclude_champ_win_rate = champ_history['win_rate']
-            play_count_vector[exclude_champ_idx] = (exclude_champ_play_count, \
-                    exclude_champ_win_rate, user_win_rate, [0 for _ in range(self.champ_num)])
-
-        for exclude_champ_idx in play_count_vector:
             for champ_history in self.batch_data[user_name]['champion_history']:
-                if exclude_champ_idx == self.remapped_champ_id[champ_history['champion_key']]:
-                    continue
+                original_champ_id = champ_history['champion_key']
+                exclude_champ_idx = self.remapped_champ_id[original_champ_id]
 
+                exclude_champ_play_count = champ_history['play_count']
+                exclude_champ_win_rate = champ_history['win_rate']
+                play_count_vector[exclude_champ_idx] = (exclude_champ_play_count, \
+                        exclude_champ_win_rate, user_win_rate, [0 for _ in range(self.champ_num)])
+
+            for exclude_champ_idx in play_count_vector:
+                for champ_history in self.batch_data[user_name]['champion_history']:
+                    if exclude_champ_idx == self.remapped_champ_id[champ_history['champion_key']]:
+                        continue
+
+                    original_champ_id = champ_history['champion_key']
+                    champ_idx = self.remapped_champ_id[original_champ_id]
+
+                    play_count_vector[exclude_champ_idx][3][champ_idx] = \
+                            self._get_user_vector_measure(user_name, champ_history, \
+                            champ_idx, self.mode, PLAY_COUNT)
+        else:
+            play_count_vector = [0 for _ in range(self.champ_num)]
+
+            for champ_history in self.batch_data[user_name]['champion_history']:
                 original_champ_id = champ_history['champion_key']
                 champ_idx = self.remapped_champ_id[original_champ_id]
-
-                play_count_vector[exclude_champ_idx][3][champ_idx] = \
+                play_count_vector[champ_idx] = \
                         self._get_user_vector_measure(user_name, champ_history, \
                         champ_idx, self.mode, PLAY_COUNT)
 
@@ -269,23 +272,31 @@ class ItemVectorGenerator():
 
         return champ_corr_matrix
 
-def generate_user_vector(mode):
+def generate_user_vector(mode, batch_data=None, to_file=True):
     user_vectors = {}
 
+    if batch_data == None:
+        batch_file = './data_batch/userbatch.json'
+        with open(batch_file, 'r') as fp:
+            batch_data = json.load(fp)
 
-    batch_file = './data_batch/userbatch.json'
-    user_vector_generator = UserVectorGenerator(batch_file, mode)
+    user_vector_generator = UserVectorGenerator(batch_data, mode)
     user_vectors = user_vector_generator.make_user_vectors()
 
-    if mode == 1:
-        user_vectors_file = './datasets/user_vectors_naive.json'
-    elif mode == 2:
-        user_vectors_file = './datasets/user_vectors_tf_idf.json'
-    elif mode == 3:
-        user_vectors_file = './datasets/user_vectors_tf_idf_excluding.json'
+    if to_file:
+        if mode == 1:
+            user_vectors_file = './datasets/user_vectors_naive.json'
+        elif mode == 2:
+            user_vectors_file = './datasets/user_vectors_tf_idf.json'
+        elif mode == 3:
+            user_vector_file = './datasets/user_vectors_tf_idf_global_win_rate.json'
+        elif mode == 4:
+            user_vectors_file = './datasets/user_vectors_tf_idf_excluding.json'
 
-    with open(user_vectors_file, 'w') as fp:
-        json.dump(user_vectors, fp)
+        with open(user_vectors_file, 'w') as fp:
+            json.dump(user_vectors, fp)
+    else:
+        return user_vectors
 
 def generate_item_vector():
     item_vectors = {}
