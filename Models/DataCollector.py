@@ -25,16 +25,16 @@ class DataCollector():
         self.key_to_id = {}
         
          
-        with open(path+'name_to_key.json', 'r') as fp:
+        with open('./metadata/name_to_key.json', 'r') as fp:
             self.name_to_key = json.load(fp)
         
-        with open('./name_to_id.json', 'r') as fp:
+        with open('./metadata/name_to_id.json', 'r') as fp:
             self.name_to_id = json.load(fp)
 
-        with open('./id_to_key.json', 'r') as fp:
+        with open('./metadata/id_to_key.json', 'r') as fp:
             self.id_to_key = json.load(fp)
         
-        with open('./key_to_id.json', 'r') as fp:
+        with open('./metadata/key_to_id.json', 'r') as fp:
             self.key_to_id = json.load(fp)
 
             

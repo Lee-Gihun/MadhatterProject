@@ -4,14 +4,13 @@ import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim.lr_scheduler import MultiStepLR
 from torch.utils.data import DataLoader, Dataset, Subset
-from champ_id_remap import champ_id_remap
+from utils import champ_id_remap, global_win_rate
 import json
 import math
 
 from Models.Models import AutoEncoder, Predictor
-from utils import global_win_rate
 
-global_win_rate = global_win_rate.global_win_rate()
+global_win_rate = global_win_rate()
 
 
 class WinRateDataset(Dataset):
@@ -108,7 +107,7 @@ valid_loader = torch.utils.data.DataLoader(valid_set, batch_size=batch_size, num
 model = Predictor(user_len=12, item_len=10, hidden_unit=22).to(device)
 criterion = nn.SmoothL1Loss()
 optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-5)
-scheduler = MultiStepLR(optimizer, [20, 40, 60, 800], gamma=0.5)
+scheduler = MultiStepLR(optimizer, [20, 40, 60, 80], gamma=0.5)
 
 loss = []
 best_model_wts = None
