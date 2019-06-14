@@ -98,7 +98,7 @@ valid_set = Subset(dataset, valid_list)
 
 num_epochs = 100
 batch_size = 32
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 learning_rate = 0.001
 
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=15)

@@ -1,4 +1,4 @@
-from urllib.request import urlopen
+ from urllib.request import urlopen
 from urllib import parse
 from bs4 import BeautifulSoup
 from Models.DataCollector import DataCollector
@@ -12,6 +12,8 @@ import torch
 from Models.Models import AutoEncoder, Predictor
 from utils import champ_id_remap, global_win_rate, get_original_champ_id
 
+device = torch.device("cpu")
+
 with open('./metadata/name_to_key.json', 'r') as fp:
     name_to_key = json.load(fp)
     
@@ -21,13 +23,16 @@ class ChampionRecommender():
         self.user_inspector = UserInspector()
 
         self.user_encoder = AutoEncoder(143, 12)
-        self.user_encoder.load_state_dict(torch.load('./trained_model/user_encoder_augmented.pth'))
+        self.user_encoder.load_state_dict(torch.load('./trained_model/user_encoder_augmented.pth', map_location="cuda:0"))
+        self.user_encoder = self.user_encoder.to(device)
 
         self.item_encoder = AutoEncoder(143, 8)
-        self.item_encoder.load_state_dict(torch.load('./trained_model/item_encoder2.pth'))
+        self.item_encoder.load_state_dict(torch.load('./trained_model/item_encoder2.pth', map_location="cuda:0"))
+        self.item_encoder = self.item_encoder.to(device)
 
         self.predictor = Predictor(user_len=12, item_len=8, hidden_unit=10).eval()
-        self.predictor.load_state_dict(torch.load('./trained_model/predictor_last_m.pth'))
+        self.predictor.load_state_dict(torch.load('./trained_model/predictor_last_m.pth', map_location="cuda:0"))
+        self.predictor = self.predictor.to(device)
         
         self.remapped_champ_id = champ_id_remap()
         self.global_win_rate = global_win_rate() 

@@ -39,7 +39,7 @@ test = VectorDataset('./datasets/user_vectors_tf_idf_excluding.json')
 num_epochs = 4000
 batch_size = 130148
 learning_rate = 0.1
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cpu")
 
 dataset = test
 dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, pin_memory=True, num_workers=4)
