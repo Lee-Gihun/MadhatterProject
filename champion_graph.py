@@ -152,7 +152,7 @@ class ChampionGraph():
 
         return overall_distance_dict
 
-    def _print_nearest_champion(self, overall_distance_dict):
+    def print_nearest_champion(self, overall_distance_dict):
         # sort overall distance dictionary and get the closeset one
         min_distance = 1.0e5
         nearest_champ = ''
